@@ -37,10 +37,12 @@ const Home = () => {
     const threadList = useSelector(({ mailThread }) => mailThread.threadList);
 
     useEffect(() => {
-        // if (Object.keys(userList).length === 0) {
-        // }
-        // dispatch(setUserList({ ...initialUserList() }));
-        // dispatch(setThreadList({ ...initialThreadList() }))
+        if (Object.keys(userList).length === 0) {
+            dispatch(setUserList({ ...initialUserList() }));
+        }
+        if (Object.keys(threadList).length === 0) {
+            dispatch(setThreadList({ ...initialThreadList() }));
+        }
     }, [dispatch, userList, threadList]);
 
     // useEffect(() => {
