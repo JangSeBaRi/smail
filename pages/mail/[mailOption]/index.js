@@ -11,7 +11,6 @@ import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 import StarOutlineIcon from "@material-ui/icons/StarOutline";
 import StarIcon from "@material-ui/icons/Star";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
-// import { BiLabel } from "react-icons/Bi";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RestoreFromTrashIcon from "@material-ui/icons/RestoreFromTrash";
@@ -293,33 +292,32 @@ export default function Mail() {
                             </Tooltip>
                         )}
                         {!v.isImportant ? (
-                            // <Tooltip
-                            //     title="Smail에 이 대화가 중요하다고 알려주려면 클릭하세요"
-                            //     placement="bottom-start"
-                            //     style={{ marginRight: 2 }}
-                            //     onClick={(e) => {
-                            //         dispatch(
-                            //             modifyThread({
-                            //                 email: loginUser.email,
-                            //                 threadUid: v.threadUid,
-                            //                 modifyProps: {
-                            //                     isImportant: true,
-                            //                 },
-                            //             })
-                            //         );
-                            //         e.stopPropagation();
-                            //     }}
-                            // >
-                            //     <IconButton size="small">
-                            //         <BiLabel
-                            //             style={{
-                            //                 color: "#d9d9d9",
-                            //                 fontSize: 22,
-                            //             }}
-                            //         />
-                            //     </IconButton>
-                            // </Tooltip>
-                            null
+                            <Tooltip
+                                title="Smail에 이 대화가 중요하다고 알려주려면 클릭하세요"
+                                placement="bottom-start"
+                                style={{ marginRight: 2 }}
+                                onClick={(e) => {
+                                    dispatch(
+                                        modifyThread({
+                                            email: loginUser.email,
+                                            threadUid: v.threadUid,
+                                            modifyProps: {
+                                                isImportant: true,
+                                            },
+                                        })
+                                    );
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <IconButton size="small">
+                                    <LabelImportantIcon
+                                        style={{
+                                            color: "#d9d9d9",
+                                            fontSize: 22,
+                                        }}
+                                    />
+                                </IconButton>
+                            </Tooltip>
                         ) : (
                             <Tooltip
                                 title="Smail에 이 대화가 중요하지 않다고 알려주려면 클릭하세요"
