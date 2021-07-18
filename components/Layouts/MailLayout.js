@@ -245,7 +245,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                             />
                         </IconButton>
                     </Tooltip>
-                    {loginUser.profileImageUrl && (
+                    {loginUser.profile && (
                         <span
                             className={`h-10 w-10 rounded-full flex justify-center items-center relative ${
                                 showUserInf ? "bg-gray-300" : "bg-white"
@@ -257,7 +257,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                         >
                             <IconButton size="small">
                                 <Image
-                                    src={loginUser.profileImageUrl}
+                                    src={loginUser.profile}
                                     width="35px"
                                     height="35px"
                                     alt="profileImage"
@@ -266,7 +266,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                                 {showUserInf && (
                                     <div className="absolute top-11 -right-2 pt-5 pb-3 border bg-white rounded-md z-30 w-72 flex flex-col items-center">
                                         <Image
-                                            src={loginUser.profileImageUrl}
+                                            src={loginUser.profile}
                                             width="70px"
                                             height="70px"
                                             alt="profileImage"

@@ -42,7 +42,7 @@ const Login = () => {
                     <div className="text-center text-2xl mt-3">계정 선택</div>
                     <div className="mt-5">
                         {Object.keys(userList).map((uid) => {
-                            const { displayName, email, profileImageUrl } =
+                            const { displayName, email, profile } =
                                 userList[uid];
                             return (
                                 <div key={uid} className="-mt-1">
@@ -51,7 +51,7 @@ const Login = () => {
                                         onClick={() => login(uid)}
                                     >
                                         <Image
-                                            src={profileImageUrl}
+                                            src={profile}
                                             height="30px"
                                             width="30px"
                                             alt="profileImage"

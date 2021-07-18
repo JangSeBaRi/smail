@@ -91,9 +91,9 @@ const mailThread = (state = initialState, action) => {
                                     .displayName,
                             email: action.userList[action.mailReceiver[i]]
                                 .email,
-                            profileImageUrl:
+                            profile:
                                 action.userList[action.mailReceiver[i]]
-                                    .profileImageUrl,
+                                    .profile,
                         };
                     }),
                     mailList: action.mailReceiver.map((v, i) => {
@@ -105,15 +105,15 @@ const mailThread = (state = initialState, action) => {
                                     action.userList[action.mailSender]
                                         .displayName,
                                 email: action.userList[action.mailSender].email,
-                                profileImageUrl:
+                                profile:
                                     action.userList[action.mailSender]
-                                        .profileImageUrl,
+                                        .profile,
                             },
                             receiver: {
                                 displayName: action.userList[v].displayName,
                                 email: action.userList[v].email,
-                                profileImageUrl:
-                                    action.userList[v].profileImageUrl,
+                                profile:
+                                    action.userList[v].profile,
                             },
                             mailUid: mailUid,
                             isStarred: false,
@@ -142,9 +142,9 @@ const mailThread = (state = initialState, action) => {
                                     action.userList[action.mailSender]
                                         .displayName,
                                 email: action.userList[action.mailSender].email,
-                                profileImageUrl:
+                                profile:
                                     action.userList[action.mailSender]
-                                        .profileImageUrl,
+                                        .profile,
                             },
                         ],
                         mailList: [
@@ -154,8 +154,8 @@ const mailThread = (state = initialState, action) => {
                                 sender: {
                                     displayName: action.userList[v].displayName,
                                     email: action.userList[v].email,
-                                    profileImageUrl:
-                                        action.userList[v].profileImageUrl,
+                                    profile:
+                                        action.userList[v].profile,
                                 },
                                 receiver: {
                                     displayName:
@@ -163,9 +163,9 @@ const mailThread = (state = initialState, action) => {
                                             .displayName,
                                     email: action.userList[action.mailSender]
                                         .email,
-                                    profileImageUrl:
+                                    profile:
                                         action.userList[action.mailSender]
-                                            .profileImageUrl,
+                                            .profile,
                                 },
                                 mailUid: mailUid,
                                 isStarred: false,

@@ -20,7 +20,7 @@ const initialState = {
     loginUser: {
         email: "",
         displayName: "",
-        profileImageUrl: "",
+        profile: "",
     },
     userList: {},
 };
@@ -47,7 +47,7 @@ const user = (state = initialState, action) => {
                 loginUser: {
                     email: "",
                     displayName: "",
-                    profileImageUrl: "",
+                    profile: "",
                 },
             };
         }
