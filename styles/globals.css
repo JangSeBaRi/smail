@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body {
   padding: 0;
@@ -13,4 +17,10 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.mailThreadList:hover {
+  box-shadow: 0px 1px 1px #c1c1c1;
+  border-left-width: 1px;
+  border-right-width: 1px;
 }
