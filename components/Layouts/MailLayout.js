@@ -341,6 +341,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                             onClick={() => {
                                 router.push(`/mail/${uid}`);
                             }}
+                            key={uid}
                         >
                             {icon}
                             <span className="pr-3 ml-2 text-gray-600">
