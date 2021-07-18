@@ -22,7 +22,28 @@ const initialState = {
         displayName: "",
         profile: "",
     },
-    userList: {},
+    userList: {
+        "sejin@smail.com": {
+            displayName: "세진",
+            email: "sejin@smail.com",
+            profile: "/profile.png",
+        },
+        "kanglim@smail.com": {
+            displayName: "강림",
+            email: "kanglim@smail.com",
+            profile: "/profile.png",
+        },
+        "jinyoung@smail.com": {
+            displayName: "진영",
+            email: "jinyoung@smail.com",
+            profile: "/profile.png",
+        },
+        "sungPha@smail.com": {
+            displayName: "성파님",
+            email: "sungPha@smail.com",
+            profile: "/profile.png",
+        },
+    },
 };
 
 const user = (state = initialState, action) => {

@@ -14,10 +14,15 @@ import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RestoreFromTrashIcon from "@material-ui/icons/RestoreFromTrash";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import DraftsIcon from "@material-ui/icons/Drafts";
 import MailIcon from "@material-ui/icons/Mail";
 import WatchLaterIcon from "@material-ui/icons/WatchLater";
-import { modifyThread } from "../../../reducers/store/mailThread";
+import { modifyThread, deleteThread } from "../../../reducers/store/mailThread";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import IndeterminateCheckBoxIcon from "@material-ui/icons/IndeterminateCheckBox";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
 export default function Mail() {
     const router = useRouter();
@@ -28,76 +33,80 @@ export default function Mail() {
     const [showSortList, setShowSortList] = useState(false);
     const [mailThreadUid, setMailThreadUid] = useState("");
     const [myThread, setMyThread] = useState([]);
+    const [checkBoxList, setCheckBoxList] = useState([]);
     const threadList = useSelector(({ mailThread }) => mailThread.threadList);
 
     useEffect(() => {
         const myArray = threadList[loginUser.email];
-        if (myArray.length === 0) {
-            return;
-        } else {
-            if (mailOption === "inbox") {
-                setMyThread(
-                    myArray
-                        .filter((v) => {
-                            return !v.isDeleted;
-                        })
-                        .filter((v) => {
-                            return v.recentReceivingMailTime != 0;
-                        })
-                        .sort((a, b) => {
-                            return (
-                                b.recentReceivingMailTime -
-                                a.recentReceivingMailTime
-                            );
-                        })
-                );
-            } else if (mailOption === "starred") {
-                setMyThread(
-                    myArray
-                        .filter((v) => {
-                            return !v.isDeleted;
-                        })
-                        .filter((v) => {
-                            return v.hasStars;
-                        })
-                );
-            } else if (mailOption === "important") {
-                setMyThread(
-                    myArray
-                        .filter((v) => {
-                            return !v.isDeleted;
-                        })
-                        .filter((v) => {
-                            return v.isImportant;
-                        })
-                );
-            } else if (mailOption === "sent") {
-                setMyThread(
-                    myArray
-                        .filter((v) => {
-                            return !v.isDeleted;
-                        })
-                        .filter((v) => {
-                            return v.recentSendingMailTime != 0;
-                        })
-                        .sort((a, b) => {
-                            return (
-                                b.recentSendingMailTime -
-                                a.recentSendingMailTime
-                            );
-                        })
-                );
-            } else if (mailOption === "delete") {
-                setMyThread(
-                    myArray.filter((v) => {
-                        return v.isDeleted;
+        if (mailOption === "inbox") {
+            setMyThread(
+                myArray
+                    .filter((v) => {
+                        return !v.isDeleted;
                     })
-                );
-            } else {
-                setMyThread([]);
-            }
+                    .filter((v) => {
+                        return v.recentReceivingMailTime != 0;
+                    })
+                    .sort((a, b) => {
+                        return (
+                            b.recentReceivingMailTime -
+                            a.recentReceivingMailTime
+                        );
+                    })
+            );
+        } else if (mailOption === "starred") {
+            setMyThread(
+                myArray
+                    .filter((v) => {
+                        return !v.isDeleted;
+                    })
+                    .filter((v) => {
+                        return v.hasStars;
+                    })
+            );
+        } else if (mailOption === "important") {
+            setMyThread(
+                myArray
+                    .filter((v) => {
+                        return !v.isDeleted;
+                    })
+                    .filter((v) => {
+                        return v.isImportant;
+                    })
+            );
+        } else if (mailOption === "sent") {
+            setMyThread(
+                myArray
+                    .filter((v) => {
+                        return !v.isDeleted;
+                    })
+                    .filter((v) => {
+                        return v.recentSendingMailTime != 0;
+                    })
+                    .sort((a, b) => {
+                        return (
+                            b.recentSendingMailTime - a.recentSendingMailTime
+                        );
+                    })
+            );
+        } else if (mailOption === "delete") {
+            setMyThread(
+                myArray.filter((v) => {
+                    return v.isDeleted;
+                })
+            );
+        } else {
+            setMyThread([]);
         }
     }, [threadList, mailOption]);
+
+    useEffect(() => {
+        setCheckBoxList(
+            myThread.map((v, i) => {
+                return false;
+            })
+        );
+    }, [myThread]);
 
     useEffect(() => {
         if (!mailOption) {
@@ -129,7 +138,7 @@ export default function Mail() {
     const headerTool = () => {
         return (
             <div className="flex py-2 px-3 items-center justify-start border-b space-x-2 relative">
-                <Tooltip
+                {/* <Tooltip
                     title="정렬"
                     onClick={(e) => {
                         setShowSortList((prev) => !prev);
@@ -144,6 +153,30 @@ export default function Mail() {
                             }}
                         />
                     </IconButton>
+                </Tooltip> */}
+                <Tooltip title="선택" className="">
+                    <IconButton size="small">
+                        <CheckBoxOutlineBlankIcon
+                            style={{
+                                color: "#5F6368",
+                            }}
+                        />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip
+                    title="선택"
+                    onClick={(e) => {
+                        setShowSortList((prev) => !prev);
+                        e.stopPropagation();
+                    }}
+                    className="relative -left-2"
+                >
+                    <ArrowDropDownIcon
+                        style={{
+                            color: "#5F6368",
+                            fontSize: 20,
+                        }}
+                    />
                 </Tooltip>
                 <Tooltip title="새로고침">
                     <IconButton size="small">
@@ -207,8 +240,12 @@ export default function Mail() {
             )}`;
             return (
                 <div
-                    className={`flex items-center border-b mailThreadList ${
-                        v.isRead ? "bg-gray-100" : "bg-white"
+                    className={`flex items-center border-b cursor-pointer mailThreadList ${
+                        v.isChecked
+                            ? "bg-blue-200"
+                            : v.isRead
+                            ? "bg-gray-100"
+                            : "bg-white"
                     }`}
                     onMouseOver={() => {
                         setMailThreadUid(v.threadUid);
@@ -237,11 +274,60 @@ export default function Mail() {
                         {mailThreadUid === v.threadUid && (
                             <DragIndicatorIcon
                                 style={{
-                                    color: "#d9d9d9",
+                                    color: "ababab",
+                                    fontSize: 20
                                 }}
                                 className="absolute left-0"
                             />
                         )}
+                        {!v.isChecked ? (
+                            <Tooltip
+                                title="선택"
+                                onClick={(e) => {
+                                    dispatch(
+                                        modifyThread({
+                                            email: loginUser.email,
+                                            threadUid: v.threadUid,
+                                            modifyProps: {
+                                                isChecked: true,
+                                            },
+                                        })
+                                    );
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <IconButton size="small">
+                                    <CheckBoxOutlineBlankIcon
+                                        className={`${
+                                            mailThreadUid === v.threadUid
+                                                ? "text-gray-600"
+                                                : "text-gray-400"
+                                        } hover:text-black`}
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        ) : (
+                            <Tooltip
+                                title="선택"
+                                onClick={(e) => {
+                                    dispatch(
+                                        modifyThread({
+                                            email: loginUser.email,
+                                            threadUid: v.threadUid,
+                                            modifyProps: {
+                                                isChecked: false,
+                                            },
+                                        })
+                                    );
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <IconButton size="small">
+                                    <CheckBoxIcon className="text-black" />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+
                         {!v.hasStars ? (
                             <Tooltip
                                 title="별표없음"
@@ -260,9 +346,11 @@ export default function Mail() {
                             >
                                 <IconButton size="small">
                                     <StarOutlineIcon
-                                        style={{
-                                            color: "#d9d9d9",
-                                        }}
+                                        className={`${
+                                            mailThreadUid === v.threadUid
+                                                ? "text-gray-600"
+                                                : "text-gray-400"
+                                        } hover:text-black`}
                                     />
                                 </IconButton>
                             </Tooltip>
@@ -311,10 +399,11 @@ export default function Mail() {
                             >
                                 <IconButton size="small">
                                     <LabelImportantIcon
-                                        style={{
-                                            color: "#d9d9d9",
-                                            fontSize: 22,
-                                        }}
+                                        className={`${
+                                            mailThreadUid === v.threadUid
+                                                ? "text-gray-600"
+                                                : "text-gray-400"
+                                        } hover:text-black`}
                                     />
                                 </IconButton>
                             </Tooltip>
@@ -372,7 +461,12 @@ export default function Mail() {
                             className="flex justify-end pr-3 py-1 space-x-3"
                             style={{ minWidth: 180 }}
                         >
-                            <Tooltip title="보관처리">
+                            <Tooltip
+                                title="보관처리"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            >
                                 <IconButton size="small">
                                     <MoveToInboxIcon className="hover:text-black" />
                                 </IconButton>
@@ -418,6 +512,24 @@ export default function Mail() {
                                     </IconButton>
                                 </Tooltip>
                             )}
+                            {v.isDeleted && (
+                                <Tooltip
+                                    title="영구삭제"
+                                    onClick={(e) => {
+                                        dispatch(
+                                            deleteThread({
+                                                email: loginUser.email,
+                                                threadUid: v.threadUid,
+                                            })
+                                        );
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <IconButton size="small">
+                                        <DeleteForeverIcon className="hover:text-black" />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
                             {!v.isRead ? (
                                 <Tooltip
                                     title="읽은 상태로 표시"
@@ -459,7 +571,12 @@ export default function Mail() {
                                     </IconButton>
                                 </Tooltip>
                             )}
-                            <Tooltip title="다시 알림">
+                            <Tooltip
+                                title="다시 알림"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            >
                                 <IconButton size="small">
                                     <WatchLaterIcon className="hover:text-black" />
                                 </IconButton>

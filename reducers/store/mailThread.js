@@ -1,9 +1,11 @@
+import { CodeSharp } from "@material-ui/icons";
 import { uuid } from "uuidv4";
 
 export const SET_THREAD_LIST = "SET_THREAD_LIST";
 export const SET_CURRENT_THREAD = "SET_CURRENT_THREAD";
 export const CREATE_NEW_THREAD = "CREATE_NEW_THREAD";
 export const MODIFY_THREAD = "MODIFY_THREAD";
+export const DELETE_THREAD = "DELETE_THREAD";
 
 export const setThreadList = (threadList) => ({
     type: SET_THREAD_LIST,
@@ -31,11 +33,18 @@ export const modifyThread = (data) => ({
     modifyProps: data.modifyProps,
 });
 
+export const deleteThread = (data) => ({
+    type: DELETE_THREAD,
+    email: data.email,
+    threadUid: data.threadUid,
+});
+
 const initialState = {
     threadList: {
         "sejin@smail.com": [],
         "kanglim@smail.com": [],
         "jinyoung@smail.com": [],
+        "sungPha@smail.com": [],
     },
     currentThread: {},
 };
@@ -71,6 +80,18 @@ const mailThread = (state = initialState, action) => {
             };
         }
 
+        case DELETE_THREAD: {
+            let newObj = { ...state.threadList };
+            const filterArray = newObj[action.email].filter((v) => {
+                return v.threadUid != action.threadUid
+            })
+            newObj[action.email] = filterArray
+            return {
+                ...state,
+                threadList: newObj,
+            };
+        }
+
         case CREATE_NEW_THREAD: {
             let newObj = { ...state.threadList };
             const senderThreadUid = uuid();
@@ -92,8 +113,7 @@ const mailThread = (state = initialState, action) => {
                             email: action.userList[action.mailReceiver[i]]
                                 .email,
                             profile:
-                                action.userList[action.mailReceiver[i]]
-                                    .profile,
+                                action.userList[action.mailReceiver[i]].profile,
                         };
                     }),
                     mailList: action.mailReceiver.map((v, i) => {
@@ -106,14 +126,12 @@ const mailThread = (state = initialState, action) => {
                                         .displayName,
                                 email: action.userList[action.mailSender].email,
                                 profile:
-                                    action.userList[action.mailSender]
-                                        .profile,
+                                    action.userList[action.mailSender].profile,
                             },
                             receiver: {
                                 displayName: action.userList[v].displayName,
                                 email: action.userList[v].email,
-                                profile:
-                                    action.userList[v].profile,
+                                profile: action.userList[v].profile,
                             },
                             mailUid: mailUid,
                             isStarred: false,
@@ -123,6 +141,7 @@ const mailThread = (state = initialState, action) => {
                     isImportant: false,
                     isDeleted: false,
                     isRead: false,
+                    isChecked: false,
                     hasStars: false,
                     recentSendingMailUid: mailUid,
                     recentSendingMailTime: time,
@@ -143,8 +162,7 @@ const mailThread = (state = initialState, action) => {
                                         .displayName,
                                 email: action.userList[action.mailSender].email,
                                 profile:
-                                    action.userList[action.mailSender]
-                                        .profile,
+                                    action.userList[action.mailSender].profile,
                             },
                         ],
                         mailList: [
@@ -154,8 +172,7 @@ const mailThread = (state = initialState, action) => {
                                 sender: {
                                     displayName: action.userList[v].displayName,
                                     email: action.userList[v].email,
-                                    profile:
-                                        action.userList[v].profile,
+                                    profile: action.userList[v].profile,
                                 },
                                 receiver: {
                                     displayName:
@@ -175,6 +192,7 @@ const mailThread = (state = initialState, action) => {
                         isImportant: false,
                         isDeleted: false,
                         isRead: false,
+                        isChecked: false,
                         hasStars: false,
                         recentSendingMailUid: "",
                         recentSendingMailTime: 0,

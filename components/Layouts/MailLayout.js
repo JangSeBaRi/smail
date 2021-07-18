@@ -37,6 +37,8 @@ const MailLayout = ({ children, onClick, mailOption }) => {
     const [mailReceiver, setMailReceiver] = useState("");
     const [mailTitle, setMailTitle] = useState("");
     const [mailcontent, setMailcontent] = useState("");
+    const [receiver, setReceiver] = useState([]);
+
     const resizeHeight = () => {
         if (showNewMail) {
             if (mailcontentRef === null || mailcontentRef.current === null) {
@@ -46,6 +48,21 @@ const MailLayout = ({ children, onClick, mailOption }) => {
             mailcontentRef.current.style.height =
                 mailcontentRef.current.scrollHeight + "px";
         }
+    };
+
+    const handleReceiver = () => {
+        const email = mailReceiver.trim();
+        const index = receiver.findIndex((v) => {
+            return v === email;
+        });
+
+        if (index === -1 && email !== "") {
+            const cp = [...receiver];
+            cp.push(email);
+            setReceiver(cp);
+        }
+
+        setMailReceiver("");
     };
 
     useEffect(() => {
@@ -333,7 +350,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                 {leftPanelOption.map(({ label, uid, icon }, i) => {
                     return (
                         <div
-                            className={`w-11/12 pl-7 rounded-r-full py-1.5 flex items-center hover:bg-gray-100 ${
+                            className={`w-11/12 pl-7 rounded-r-full py-1.5 flex items-center cursor-pointer hover:bg-gray-100 ${
                                 mailOption === uid
                                     ? "bg-gray-200 hover:bg-gray-200"
                                     : ""
@@ -386,7 +403,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
-                style={{ minWidth: 540, minHeight: 500, right: 70 }}
+                style={{ width: 540, minHeight: 500, right: 70 }}
             >
                 <div
                     className="w-full  flex justify-between items-center pl-4 pr-2 py-2 rounded-t-lg"
@@ -394,7 +411,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                 >
                     <div className="text-white text-sm">새 메일</div>
                     <div className="flex items-center">
-                        <div className="w-6 h-6 flex justify-center items-center text-gray-400 hover:text-white hover:bg-gray-500">
+                        <div className="w-6 h-6 flex justify-center items-center text-gray-400 hover:text-white hover:bg-gray-500 cursor-pointer">
                             <Tooltip title="최소화">
                                 <MinimizeIcon
                                     style={{
@@ -403,7 +420,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                                 />
                             </Tooltip>
                         </div>
-                        <div className="w-6 h-6 flex justify-center items-center text-gray-400 hover:text-white hover:bg-gray-500">
+                        <div className="w-6 h-6 flex justify-center items-center text-gray-400 hover:text-white hover:bg-gray-500 cursor-pointer">
                             <Tooltip title="전체 화면으로 보기">
                                 <ZoomOutMapIcon
                                     style={{
@@ -413,7 +430,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                             </Tooltip>
                         </div>
                         <div
-                            className="w-6 h-6 flex justify-center items-center text-gray-400 hover:text-white hover:bg-gray-500"
+                            className="w-6 h-6 flex justify-center items-center text-gray-400 hover:text-white hover:bg-gray-500 cursor-pointer"
                             onClick={(e) => {
                                 setShowNewMail((prev) => !prev);
                                 e.stopPropagation();
@@ -429,17 +446,56 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                         </div>
                     </div>
                 </div>
+
                 <div className="px-4 flex flex-col">
-                    <div className="py-2 flex border-b text-sm">
-                        <span className="text-gray-500">받는사람</span>
-                        <input
-                            type="text"
-                            className="outline-none placeholder-gray-500 flex-auto ml-2"
-                            value={mailReceiver}
-                            onChange={(e) => {
-                                setMailReceiver(e.target.value);
-                            }}
-                        />
+                    <div className="flex py-2 items-center border-b">
+                        <span
+                            className="mr-2 text-sm text-gray-500"
+                            style={{ minWidth: 60 }}
+                        >
+                            받는사람
+                        </span>
+                        <div className="flex flex-wrap items-center">
+                            {receiver.map((re) => {
+                                return (
+                                    <div
+                                        key={re}
+                                        className="flex h-5 items-center justify-center px-2 mr-1.5 text-sm text-gray-500 border rounded-full hover:bg-gray-100"
+                                    >
+                                        <span className="mr-1">{re}</span>
+                                        <ClearIcon
+                                            size="15px"
+                                            color="rgb(107, 114, 128)"
+                                            className="cursor-pointer"
+                                            onClick={() => {
+                                                setReceiver(
+                                                    [...receiver].filter(
+                                                        (v) => {
+                                                            return v !== re;
+                                                        }
+                                                    )
+                                                );
+                                            }}
+                                        />
+                                    </div>
+                                );
+                            })}
+                            <div>
+                                <input
+                                    value={mailReceiver}
+                                    onChange={(e) =>
+                                        setMailReceiver(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                        if (e.code === "Space") {
+                                            handleReceiver();
+                                        }
+                                    }}
+                                    onBlur={() => handleReceiver()}
+                                    className="w-full h-full text-sm outline-none"
+                                />
+                            </div>
+                        </div>
                     </div>
                     <div className="py-2 flex border-b text-sm">
                         <input
@@ -484,29 +540,61 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                                 color: "white",
                             }}
                             onClick={() => {
-                                dispatch(createNewThread({
-                                    mailSender: loginUser.email,
-                                    mailReceiver: mailReceiver.split(" "),
-                                    mailTitle: mailTitle,
-                                    mailcontent: mailcontent,
-                                    userList: userList
-                                }));
+                                let num = 0;
+                                if (receiver.length === 0) {
+                                    alert("받는사람을 입력해 주세요.");
+                                    return;
+                                } else {
+                                    for (var i = 0; i < receiver.length; i++) {
+                                        num = Object.keys(userList).indexOf(
+                                            receiver[i]
+                                        );
+                                        if (num === -1) {
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (num === -1) {
+                                    alert(
+                                        "이메일이 존재하지 않습니다. 가입한 사용자의 메일을 입력해주세요."
+                                    );
+                                    return;
+                                }
+                                if (!mailTitle) {
+                                    alert("제목을 입력해주세요.");
+                                    return;
+                                }
+                                if (!mailcontent) {
+                                    alert("메세지를 입력해주세요.");
+                                    return
+                                }
+                                dispatch(
+                                    createNewThread({
+                                        mailSender: loginUser.email,
+                                        mailReceiver: receiver,
+                                        mailTitle: mailTitle,
+                                        mailcontent: mailcontent,
+                                        userList: userList,
+                                    })
+                                );
                                 setShowNewMail(false);
                                 setMailReceiver("");
                                 setMailTitle("");
                                 setMailcontent("");
+                                setReceiver([]);
                                 alert("메일을 성공적으로 보냈습니다.");
                             }}
                         >
                             보내기
                         </Button>
                         <div
-                            className="w-7 h-7 flex justify-center items-center rounded text-gray-500 hover:text-black hover:bg-gray-100 ml-2"
+                            className="w-7 h-7 flex justify-center items-center rounded text-gray-500 hover:text-black hover:bg-gray-100 ml-2 cursor-pointer"
                             onClick={() => {
                                 setShowNewMail(false);
                                 setMailReceiver("");
                                 setMailTitle("");
                                 setMailcontent("");
+                                setReceiver([]);
                             }}
                         >
                             <Tooltip title="임시보관 메일 삭제">

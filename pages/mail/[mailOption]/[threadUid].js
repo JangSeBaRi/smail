@@ -21,12 +21,15 @@ export default function Mail() {
         const index = threadList[loginUser.email].findIndex((v) => {
             return v.threadUid === router.query.threadUid;
         });
+        if (index === -1) {
+            return;
+        }
         setMailList(
             threadList[loginUser.email][index].mailList.sort((a, b) => {
                 return a.time - b.time;
             })
         );
-    }, [threadList]);
+    }, [threadList, router.query.mailOption]);
 
     useEffect(() => {
         if (mailList.length === 0) {
