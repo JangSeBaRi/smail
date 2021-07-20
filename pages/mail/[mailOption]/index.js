@@ -11,7 +11,7 @@ import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 import StarOutlineIcon from "@material-ui/icons/StarOutline";
 import StarIcon from "@material-ui/icons/Star";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
-import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
+import ArchiveIcon from "@material-ui/icons/Archive";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RestoreFromTrashIcon from "@material-ui/icons/RestoreFromTrash";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
@@ -23,6 +23,8 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import IndeterminateCheckBoxIcon from "@material-ui/icons/IndeterminateCheckBox";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import ErrorIcon from "@material-ui/icons/Error";
 
 export default function Mail() {
     const router = useRouter();
@@ -34,6 +36,15 @@ export default function Mail() {
     const [mailThreadUid, setMailThreadUid] = useState("");
     const [myThread, setMyThread] = useState([]);
     const [checkBoxList, setCheckBoxList] = useState([]);
+
+    useEffect(() => {
+        setCheckBoxList(
+            myThread.map((v) => {
+                return false;
+            })
+        );
+        setMailThreadUid("")
+    }, [myThread.length]);
     const threadList = useSelector(({ mailThread }) => mailThread.threadList);
 
     useEffect(() => {
@@ -101,14 +112,6 @@ export default function Mail() {
     }, [threadList, mailOption]);
 
     useEffect(() => {
-        setCheckBoxList(
-            myThread.map((v, i) => {
-                return false;
-            })
-        );
-    }, [myThread]);
-
-    useEffect(() => {
         if (!mailOption) {
             return;
         }
@@ -136,33 +139,66 @@ export default function Mail() {
     };
 
     const headerTool = () => {
+        let trueArrayLength = checkBoxList.filter((x) => {
+            return x;
+        }).length;
         return (
             <div className="flex py-2 px-3 items-center justify-start border-b space-x-2 relative">
-                {/* <Tooltip
-                    title="정렬"
-                    onClick={(e) => {
-                        setShowSortList((prev) => !prev);
-                        e.stopPropagation();
-                    }}
-                    placement="left"
-                >
-                    <IconButton size="small">
-                        <SortIcon
-                            style={{
-                                color: "#5F6368",
-                            }}
-                        />
-                    </IconButton>
-                </Tooltip> */}
-                <Tooltip title="선택" className="">
-                    <IconButton size="small">
-                        <CheckBoxOutlineBlankIcon
-                            style={{
-                                color: "#5F6368",
-                            }}
-                        />
-                    </IconButton>
-                </Tooltip>
+                {trueArrayLength === 0 ? (
+                    <Tooltip
+                        title="선택"
+                        onClick={() => {
+                            const cp = [...checkBoxList];
+                            setCheckBoxList(
+                                cp.map((v) => {
+                                    return true;
+                                })
+                            );
+                        }}
+                    >
+                        <IconButton size="small">
+                            <CheckBoxOutlineBlankIcon
+                                className={`text-gray-500 hover:text-black`}
+                            />
+                        </IconButton>
+                    </Tooltip>
+                ) : trueArrayLength === checkBoxList.length ? (
+                    <Tooltip
+                        title="선택"
+                        onClick={() => {
+                            const cp = [...checkBoxList];
+                            setCheckBoxList(
+                                cp.map((v) => {
+                                    return false;
+                                })
+                            );
+                        }}
+                    >
+                        <IconButton size="small">
+                            <CheckBoxIcon
+                                className={`text-gray-500 hover:text-black`}
+                            />
+                        </IconButton>
+                    </Tooltip>
+                ) : (
+                    <Tooltip
+                        title="선택"
+                        onClick={() => {
+                            const cp = [...checkBoxList];
+                            setCheckBoxList(
+                                cp.map((v) => {
+                                    return false;
+                                })
+                            );
+                        }}
+                    >
+                        <IconButton size="small">
+                            <IndeterminateCheckBoxIcon
+                                className={`text-gray-500 hover:text-black`}
+                            />
+                        </IconButton>
+                    </Tooltip>
+                )}
                 <Tooltip
                     title="선택"
                     onClick={(e) => {
@@ -178,34 +214,156 @@ export default function Mail() {
                         }}
                     />
                 </Tooltip>
-                <Tooltip title="새로고침">
-                    <IconButton size="small">
-                        <RefreshIcon
-                            style={{
-                                color: "#5F6368",
-                            }}
-                        />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="더보기">
-                    <IconButton size="small">
-                        <MoreVertIcon
-                            style={{
-                                color: "#5F6368",
-                            }}
-                        />
-                    </IconButton>
-                </Tooltip>
+                {trueArrayLength === 0 ? (
+                    <div className="flex items-center space-x-4">
+                        <Tooltip title="새로고침">
+                            <IconButton size="small">
+                                <RefreshIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="더보기">
+                            <IconButton size="small">
+                                <MoreVertIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                ) : (
+                    <div className="flex items-center space-x-4">
+                        <Tooltip title="보관처리">
+                            <IconButton size="small">
+                                <ArchiveIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="스팸신고">
+                            <IconButton size="small">
+                                <ErrorIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="삭제">
+                            <IconButton size="small">
+                                <DeleteIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <div className="border-l h-5"></div>
+                        <Tooltip title="읽은 상태로 표시">
+                            <IconButton size="small">
+                                <DraftsIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="읽은 않은 상태로 표시">
+                            <IconButton size="small">
+                                <MailIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="다시알림">
+                            <IconButton size="small">
+                                <WatchLaterIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Tasks에 추가">
+                            <IconButton size="small">
+                                <AddCircleIcon
+                                    className={`text-gray-500 hover:text-black`}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                )}
                 {showSortList && (
                     <div className="shadow-xl rounded-md py-2 bg-white absolute top-10 left-0 border z-50">
-                        <p className="flex justify-center items-center py-2 px-12 hover:bg-gray-100">
+                        <p
+                            className="flex justify-center items-center py-2 px-12 hover:bg-gray-100"
+                            onClick={() => {
+                                const cp = [...checkBoxList];
+                                setCheckBoxList(
+                                    cp.map((x) => {
+                                        return true;
+                                    })
+                                );
+                            }}
+                        >
                             전체선택
                         </p>
-                        <p className="flex items-center py-2 px-12 hover:bg-gray-100">
+                        <p
+                            className="flex items-center py-2 px-12 hover:bg-gray-100"
+                            onClick={() => {
+                                const cp = [...checkBoxList];
+                                setCheckBoxList(
+                                    cp.map((x) => {
+                                        return false;
+                                    })
+                                );
+                            }}
+                        >
+                            선택안함
+                        </p>
+                        <p
+                            className="flex items-center py-2 px-12 hover:bg-gray-100"
+                            onClick={() => {
+                                const cp = [...checkBoxList];
+                                setCheckBoxList(
+                                    cp.map((x, indx) => {
+                                        return myThread[indx].isRead;
+                                    })
+                                );
+                            }}
+                        >
                             읽음
                         </p>
-                        <p className="flex justify-center items-center py-2 px-12 hover:bg-gray-100">
+                        <p
+                            className="flex justify-center items-center py-2 px-12 hover:bg-gray-100"
+                            onClick={() => {
+                                const cp = [...checkBoxList];
+                                setCheckBoxList(
+                                    cp.map((x, indx) => {
+                                        return !myThread[indx].isRead;
+                                    })
+                                );
+                            }}
+                        >
                             읽지않음
+                        </p>
+                        <p
+                            className="flex items-center py-2 px-12 hover:bg-gray-100"
+                            onClick={() => {
+                                const cp = [...checkBoxList];
+                                setCheckBoxList(
+                                    cp.map((x, indx) => {
+                                        return myThread[indx].hasStars;
+                                    })
+                                );
+                            }}
+                        >
+                            별표
+                        </p>
+                        <p
+                            className="flex items-center py-2 px-12 hover:bg-gray-100"
+                            onClick={() => {
+                                const cp = [...checkBoxList];
+                                setCheckBoxList(
+                                    cp.map((x, indx) => {
+                                        return !myThread[indx].hasStars;
+                                    })
+                                );
+                            }}
+                        >
+                            별표없음
                         </p>
                     </div>
                 )}
@@ -241,7 +399,7 @@ export default function Mail() {
             return (
                 <div
                     className={`flex items-center border-b cursor-pointer mailThreadList ${
-                        v.isChecked
+                        checkBoxList[i]
                             ? "bg-blue-200"
                             : v.isRead
                             ? "bg-gray-100"
@@ -275,24 +433,18 @@ export default function Mail() {
                             <DragIndicatorIcon
                                 style={{
                                     color: "ababab",
-                                    fontSize: 20
+                                    fontSize: 20,
                                 }}
                                 className="absolute left-0"
                             />
                         )}
-                        {!v.isChecked ? (
+                        {!checkBoxList[i] ? (
                             <Tooltip
                                 title="선택"
                                 onClick={(e) => {
-                                    dispatch(
-                                        modifyThread({
-                                            email: loginUser.email,
-                                            threadUid: v.threadUid,
-                                            modifyProps: {
-                                                isChecked: true,
-                                            },
-                                        })
-                                    );
+                                    let cp = [...checkBoxList];
+                                    cp[i] = !cp[i];
+                                    setCheckBoxList(cp);
                                     e.stopPropagation();
                                 }}
                             >
@@ -300,7 +452,7 @@ export default function Mail() {
                                     <CheckBoxOutlineBlankIcon
                                         className={`${
                                             mailThreadUid === v.threadUid
-                                                ? "text-gray-600"
+                                                ? "text-gray-500"
                                                 : "text-gray-400"
                                         } hover:text-black`}
                                     />
@@ -310,20 +462,16 @@ export default function Mail() {
                             <Tooltip
                                 title="선택"
                                 onClick={(e) => {
-                                    dispatch(
-                                        modifyThread({
-                                            email: loginUser.email,
-                                            threadUid: v.threadUid,
-                                            modifyProps: {
-                                                isChecked: false,
-                                            },
-                                        })
-                                    );
+                                    let cp = [...checkBoxList];
+                                    cp[i] = !cp[i];
+                                    setCheckBoxList(cp);
                                     e.stopPropagation();
                                 }}
                             >
                                 <IconButton size="small">
-                                    <CheckBoxIcon className="text-black" />
+                                    <CheckBoxIcon
+                                        className={`text-gray-500 hover:text-black`}
+                                    />
                                 </IconButton>
                             </Tooltip>
                         )}
@@ -348,7 +496,7 @@ export default function Mail() {
                                     <StarOutlineIcon
                                         className={`${
                                             mailThreadUid === v.threadUid
-                                                ? "text-gray-600"
+                                                ? "text-gray-500"
                                                 : "text-gray-400"
                                         } hover:text-black`}
                                     />
@@ -401,7 +549,7 @@ export default function Mail() {
                                     <LabelImportantIcon
                                         className={`${
                                             mailThreadUid === v.threadUid
-                                                ? "text-gray-600"
+                                                ? "text-gray-500"
                                                 : "text-gray-400"
                                         } hover:text-black`}
                                     />
@@ -468,7 +616,7 @@ export default function Mail() {
                                 }}
                             >
                                 <IconButton size="small">
-                                    <MoveToInboxIcon className="hover:text-black" />
+                                    <ArchiveIcon className="hover:text-black" />
                                 </IconButton>
                             </Tooltip>
                             {!v.isDeleted ? (
