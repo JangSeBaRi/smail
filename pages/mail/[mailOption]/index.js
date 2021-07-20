@@ -43,7 +43,7 @@ export default function Mail() {
                 return false;
             })
         );
-        setMailThreadUid("")
+        setMailThreadUid("");
     }, [myThread.length]);
     const threadList = useSelector(({ mailThread }) => mailThread.threadList);
 
@@ -233,42 +233,167 @@ export default function Mail() {
                     </div>
                 ) : (
                     <div className="flex items-center space-x-4">
-                        <Tooltip title="보관처리">
-                            <IconButton size="small">
-                                <ArchiveIcon
-                                    className={`text-gray-500 hover:text-black`}
-                                />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="스팸신고">
-                            <IconButton size="small">
-                                <ErrorIcon
-                                    className={`text-gray-500 hover:text-black`}
-                                />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="삭제">
-                            <IconButton size="small">
-                                <DeleteIcon
-                                    className={`text-gray-500 hover:text-black`}
-                                />
-                            </IconButton>
-                        </Tooltip>
+                        {mailOption !== "delete" ? (
+                            <div className="flex items-center space-x-4">
+                                <Tooltip title="보관처리">
+                                    <IconButton size="small">
+                                        <ArchiveIcon
+                                            className={`text-gray-500 hover:text-black`}
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="스팸신고">
+                                    <IconButton size="small">
+                                        <ErrorIcon
+                                            className={`text-gray-500 hover:text-black`}
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip
+                                    title="삭제"
+                                    onClick={() => {
+                                        checkBoxList.forEach((x, indx) => {
+                                            dispatch(
+                                                modifyThread({
+                                                    email: loginUser.email,
+                                                    threadUid:
+                                                        myThread[indx]
+                                                            .threadUid,
+                                                    modifyProps: {
+                                                        isDeleted: x,
+                                                    },
+                                                })
+                                            );
+                                        });
+                                    }}
+                                >
+                                    <IconButton size="small">
+                                        <DeleteIcon
+                                            className={`text-gray-500 hover:text-black`}
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                        ) : (
+                            <div className="flex items-center space-x-4">
+                                <Tooltip
+                                    title="영구삭제"
+                                    onClick={() => {
+                                        checkBoxList.forEach((x, indx) => {
+                                            dispatch(
+                                                deleteThread({
+                                                    email: loginUser.email,
+                                                    threadUid:
+                                                        myThread[indx]
+                                                            .threadUid,
+                                                })
+                                            );
+                                        });
+                                    }}
+                                >
+                                    <IconButton size="small">
+                                        <DeleteForeverIcon
+                                            className={`text-gray-500 hover:text-black`}
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip
+                                    title="복구"
+                                    onClick={() => {
+                                        checkBoxList.forEach((x, indx) => {
+                                            dispatch(
+                                                modifyThread({
+                                                    email: loginUser.email,
+                                                    threadUid:
+                                                        myThread[indx]
+                                                            .threadUid,
+                                                    modifyProps: {
+                                                        isDeleted: !x,
+                                                    },
+                                                })
+                                            );
+                                        });
+                                    }}
+                                >
+                                    <IconButton size="small">
+                                        <RestoreFromTrashIcon
+                                            className={`text-gray-500 hover:text-black`}
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="스팸신고">
+                                    <IconButton size="small">
+                                        <ErrorIcon
+                                            className={`text-gray-500 hover:text-black`}
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                        )}
                         <div className="border-l h-5"></div>
-                        <Tooltip title="읽은 상태로 표시">
-                            <IconButton size="small">
-                                <DraftsIcon
-                                    className={`text-gray-500 hover:text-black`}
-                                />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="읽은 않은 상태로 표시">
-                            <IconButton size="small">
-                                <MailIcon
-                                    className={`text-gray-500 hover:text-black`}
-                                />
-                            </IconButton>
-                        </Tooltip>
+                        {myThread
+                            .map((x) => {
+                                return x.isRead;
+                            })
+                            .filter((s, indx) => {
+                                return !s && checkBoxList[indx];
+                            }).length > 0 ? (
+                            <Tooltip
+                                title="읽은 상태로 표시"
+                                onClick={() => {
+                                    checkBoxList.forEach((x, indx) => {
+                                        {
+                                            x &&
+                                                dispatch(
+                                                    modifyThread({
+                                                        email: loginUser.email,
+                                                        threadUid:
+                                                            myThread[indx]
+                                                                .threadUid,
+                                                        modifyProps: {
+                                                            isRead: true,
+                                                        },
+                                                    })
+                                                );
+                                        }
+                                    });
+                                }}
+                            >
+                                <IconButton size="small">
+                                    <DraftsIcon
+                                        className={`text-gray-500 hover:text-black`}
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        ) : (
+                            <Tooltip
+                                title="읽은 않은 상태로 표시"
+                                onClick={() => {
+                                    checkBoxList.forEach((x, indx) => {
+                                        {
+                                            x &&
+                                                dispatch(
+                                                    modifyThread({
+                                                        email: loginUser.email,
+                                                        threadUid:
+                                                            myThread[indx]
+                                                                .threadUid,
+                                                        modifyProps: {
+                                                            isRead: false,
+                                                        },
+                                                    })
+                                                );
+                                        }
+                                    });
+                                }}
+                            >
+                                <IconButton size="small">
+                                    <MailIcon
+                                        className={`text-gray-500 hover:text-black`}
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        )}
                         <Tooltip title="다시알림">
                             <IconButton size="small">
                                 <WatchLaterIcon
@@ -476,7 +601,7 @@ export default function Mail() {
                             </Tooltip>
                         )}
 
-                        {!v.hasStars ? (
+                        {!v.hasStars && mailOption !== "delete" ? (
                             <Tooltip
                                 title="별표없음"
                                 onClick={(e) => {
@@ -502,7 +627,7 @@ export default function Mail() {
                                     />
                                 </IconButton>
                             </Tooltip>
-                        ) : (
+                        ) : v.hasStars && mailOption !== "delete" ? (
                             <Tooltip
                                 title="별표편지함"
                                 onClick={(e) => {
@@ -526,7 +651,7 @@ export default function Mail() {
                                     />
                                 </IconButton>
                             </Tooltip>
-                        )}
+                        ) : null}
                         {!v.isImportant ? (
                             <Tooltip
                                 title="Smail에 이 대화가 중요하다고 알려주려면 클릭하세요"
@@ -581,7 +706,10 @@ export default function Mail() {
                                 </IconButton>
                             </Tooltip>
                         )}
-                        <div className="text-sm">
+                        <div className="text-sm flex items-center">
+                            {mailOption === "delete" ? (
+                                <DeleteIcon className={"text-gray-500"} />
+                            ) : null}
                             <span
                                 className={`${
                                     v.isRead ? "font-normal" : "font-semibold"
@@ -594,7 +722,7 @@ export default function Mail() {
                             <span className="text-xs">{v.mailList.length}</span>
                         </div>
                     </div>
-                    <div className="flex-auto text-sm">
+                    <div className="flex-auto text-sm h-5 overflow-hidden">
                         <span
                             className={`${
                                 v.isRead ? "font-normal" : "font-semibold"
@@ -609,16 +737,35 @@ export default function Mail() {
                             className="flex justify-end pr-3 py-1 space-x-3"
                             style={{ minWidth: 180 }}
                         >
-                            <Tooltip
-                                title="보관처리"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <IconButton size="small">
-                                    <ArchiveIcon className="hover:text-black" />
-                                </IconButton>
-                            </Tooltip>
+                            {!v.isDeleted ? (
+                                <Tooltip
+                                    title="보관처리"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <IconButton size="small">
+                                        <ArchiveIcon className="hover:text-black" />
+                                    </IconButton>
+                                </Tooltip>
+                            ) : (
+                                <Tooltip
+                                    title="영구삭제"
+                                    onClick={(e) => {
+                                        dispatch(
+                                            deleteThread({
+                                                email: loginUser.email,
+                                                threadUid: v.threadUid,
+                                            })
+                                        );
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <IconButton size="small">
+                                        <DeleteForeverIcon className="hover:text-black" />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
                             {!v.isDeleted ? (
                                 <Tooltip
                                     title="삭제"
@@ -657,24 +804,6 @@ export default function Mail() {
                                 >
                                     <IconButton size="small">
                                         <RestoreFromTrashIcon className="hover:text-black" />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-                            {v.isDeleted && (
-                                <Tooltip
-                                    title="영구삭제"
-                                    onClick={(e) => {
-                                        dispatch(
-                                            deleteThread({
-                                                email: loginUser.email,
-                                                threadUid: v.threadUid,
-                                            })
-                                        );
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <IconButton size="small">
-                                        <DeleteForeverIcon className="hover:text-black" />
                                     </IconButton>
                                 </Tooltip>
                             )}
@@ -733,7 +862,7 @@ export default function Mail() {
                     ) : (
                         <div
                             className="flex text-sm justify-end pr-3"
-                            style={{ minWidth: 100 }}
+                            style={{ minWidth: 130 }}
                         >
                             <span
                                 className={`${
