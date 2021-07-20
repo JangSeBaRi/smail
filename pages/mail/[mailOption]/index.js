@@ -523,13 +523,17 @@ export default function Mail() {
             )}`;
             return (
                 <div
-                    className={`flex items-center border-b cursor-pointer mailThreadList ${
+                    className={`flex items-center cursor-pointer mailThreadList ${
                         checkBoxList[i]
                             ? "bg-blue-200"
                             : v.isRead
-                            ? "bg-gray-100"
+                            ? "bg-gray-200"
                             : "bg-white"
                     }`}
+                    style={{
+                        borderBottom: "1px solid #bfbfbf",
+                        marginBottom: 5,
+                    }}
                     onMouseOver={() => {
                         setMailThreadUid(v.threadUid);
                     }}
@@ -656,7 +660,6 @@ export default function Mail() {
                             <Tooltip
                                 title="Smail에 이 대화가 중요하다고 알려주려면 클릭하세요"
                                 placement="bottom-start"
-                                style={{ marginRight: 2 }}
                                 onClick={(e) => {
                                     dispatch(
                                         modifyThread({
@@ -706,31 +709,51 @@ export default function Mail() {
                                 </IconButton>
                             </Tooltip>
                         )}
-                        <div className="text-sm flex items-center">
-                            {mailOption === "delete" ? (
-                                <DeleteIcon className={"text-gray-500"} />
-                            ) : null}
-                            <span
-                                className={`${
-                                    v.isRead ? "font-normal" : "font-semibold"
-                                }`}
-                            >{`나, ${v.receiverList
-                                .map((x) => {
-                                    return x.displayName;
-                                })
-                                .join()}`}</span>{" "}
-                            <span className="text-xs">{v.mailList.length}</span>
-                        </div>
+                        {mailOption === "sent" ? (
+                            <div className="text-sm flex items-center">
+                                <span>{`받는사람: ${v.receiverList
+                                    .map((x) => {
+                                        return x.displayName;
+                                    })
+                                    .join()}`}</span>
+                            </div>
+                        ) : (
+                            <div className="text-sm flex items-center">
+                                {mailOption === "delete" ? (
+                                    <DeleteIcon className={"text-gray-500"} />
+                                ) : null}
+                                <span
+                                    className={`${
+                                        v.isRead
+                                            ? "font-normal"
+                                            : "font-semibold"
+                                    }`}
+                                >{`나, ${v.receiverList
+                                    .map((x) => {
+                                        return x.displayName;
+                                    })
+                                    .join()}`}</span>{" "}
+                                <span className="text-xs">
+                                    {v.mailList.length}
+                                </span>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex-auto text-sm h-5 overflow-hidden">
+                    <div
+                        className="flex-auto text-sm truncate"
+                        style={{ width: 0 }}
+                    >
                         <span
-                            className={`${
+                            className={`w-max truncate inline-block relative ${
                                 v.isRead ? "font-normal" : "font-semibold"
                             }`}
+                            style={{ maxWidth: 200, top: 2 }}
                         >
                             {v.mailList[v.mailList.length - 1].subject}
-                        </span>{" "}
-                        - {v.mailList[v.mailList.length - 1].content}
+                        </span>
+                        <span className="relative" style={{ top: -3 }}>
+                            {` - ${v.mailList[v.mailList.length - 1].content}`}
+                        </span>
                     </div>
                     {mailThreadUid === v.threadUid ? (
                         <div

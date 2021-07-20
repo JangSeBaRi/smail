@@ -265,7 +265,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                     {loginUser.profile && (
                         <span
                             className={`h-10 w-10 rounded-full flex justify-center items-center relative ${
-                                showUserInf ? "bg-gray-300" : "bg-white"
+                                showUserInf ? "bg-gray-300" : "bg-transparent"
                             }`}
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -455,7 +455,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                         >
                             받는사람
                         </span>
-                        <div className="flex flex-wrap items-center">
+                        <div className="flex flex-auto flex-wrap items-center">
                             {receiver.map((re) => {
                                 return (
                                     <div
@@ -480,7 +480,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                                     </div>
                                 );
                             })}
-                            <div>
+                            <div className="flex-auto">
                                 <input
                                     value={mailReceiver}
                                     onChange={(e) =>
@@ -610,7 +610,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
     return (
         //bg-background
         <div
-            className="w-screen h-screen overflow-y-hidden"
+            className="w-screen h-screen overflow-y-hidden bg-cover bg-background"
             onClick={() => {
                 setShowUserInf(false);
                 onClick();
