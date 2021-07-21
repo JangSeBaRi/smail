@@ -5,6 +5,7 @@ export const SET_THREAD_LIST = "SET_THREAD_LIST";
 export const SET_CURRENT_THREAD = "SET_CURRENT_THREAD";
 export const CREATE_NEW_THREAD = "CREATE_NEW_THREAD";
 export const MODIFY_THREAD = "MODIFY_THREAD";
+export const MODIFY_MAIL = "MODIFY_MAIL";
 export const DELETE_THREAD = "DELETE_THREAD";
 
 export const setThreadList = (threadList) => ({
@@ -30,6 +31,14 @@ export const modifyThread = (data) => ({
     type: MODIFY_THREAD,
     email: data.email,
     threadUid: data.threadUid,
+    modifyProps: data.modifyProps,
+});
+
+export const modifyMail = (data) => ({
+    type: MODIFY_MAIL,
+    email: data.email,
+    threadUid: data.threadUid,
+    mailUid: data.mailUid,
     modifyProps: data.modifyProps,
 });
 
@@ -80,12 +89,32 @@ const mailThread = (state = initialState, action) => {
             };
         }
 
+        case MODIFY_MAIL: {
+            let newObj = { ...state.threadList };
+            const index = newObj[action.email].findIndex((v) => {
+                return v.threadUid === action.threadUid;
+            });
+            const mailIndex = newObj[action.email][index].mailList.findIndex(
+                (v) => {
+                    return v.mailUid === action.mailUid;
+                }
+            );
+            newObj[action.email][index].mailList[mailIndex] = {
+                ...newObj[action.email][index].mailList[mailIndex],
+                ...action.modifyProps,
+            };
+            return {
+                ...state,
+                threadList: newObj,
+            };
+        }
+
         case DELETE_THREAD: {
             let newObj = { ...state.threadList };
             const filterArray = newObj[action.email].filter((v) => {
-                return v.threadUid != action.threadUid
-            })
-            newObj[action.email] = filterArray
+                return v.threadUid != action.threadUid;
+            });
+            newObj[action.email] = filterArray;
             return {
                 ...state,
                 threadList: newObj,
@@ -116,8 +145,8 @@ const mailThread = (state = initialState, action) => {
                                 action.userList[action.mailReceiver[i]].profile,
                         };
                     }),
-                    mailList: action.mailReceiver.map((v, i) => {
-                        return {
+                    mailList: [
+                        {
                             subject: action.mailTitle,
                             content: action.mailcontent,
                             sender: {
@@ -128,16 +157,18 @@ const mailThread = (state = initialState, action) => {
                                 profile:
                                     action.userList[action.mailSender].profile,
                             },
-                            receiver: {
-                                displayName: action.userList[v].displayName,
-                                email: action.userList[v].email,
-                                profile: action.userList[v].profile,
-                            },
+                            receiver: action.mailReceiver.map((v, i) => {
+                                return {
+                                    displayName: action.userList[v].displayName,
+                                    email: action.userList[v].email,
+                                    profile: action.userList[v].profile,
+                                };
+                            }),
                             mailUid: mailUid,
                             isStarred: false,
                             time: time,
-                        };
-                    }),
+                        },
+                    ],
                     isImportant: false,
                     isDeleted: false,
                     isRead: false,
