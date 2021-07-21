@@ -124,10 +124,10 @@ const MailLayout = ({ children, onClick, mailOption }) => {
     const header = () => {
         return (
             <div
-                className="flex items-center border-b px-2 py-2 w-full"
-                style={{ height: 65 }}
+                className="flex items-center border-b px-2 w-full"
                 style={{
                     borderBottom: "1px solid #bfbfbf",
+                    height: 65,
                 }}
             >
                 <div className="flex items-center" style={{ minWidth: 250 }}>

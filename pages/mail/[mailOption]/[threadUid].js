@@ -288,7 +288,7 @@ export default function Mail() {
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-1 relative">
-                                <span className="absolute top-0 -left-14">
+                                <span className="absolute top-0" style={{left: -52}}>
                                     <Image
                                         src={v.sender.profile}
                                         width="42px"
