@@ -83,7 +83,11 @@ export default function Mail() {
 
     const headerTool = () => {
         return (
-            <div className="flex py-2 px-3 items-center justify-start border-b space-x-4">
+            <div className="flex py-2 px-3 items-center justify-start space-x-4"
+            style={{
+                borderBottom: "1px solid #bfbfbf",
+            }}
+            >
                 <span
                     className="mr-3"
                     onClick={() => {
@@ -200,7 +204,7 @@ export default function Mail() {
             };
             return (
                 <div key={i}>
-                    <div className="flex items-center justify-between pt-2 pl-16 pr-8">
+                    <div className="flex items-center justify-between pt-2 pl-16 pr-8 bg-white">
                         <div className="flex items-center">
                             <span className="text-2xl">{v.subject}</span>
                             {!myThread.isImportant ? (
@@ -268,11 +272,18 @@ export default function Mail() {
                         </div>
                     </div>
                     <div
-                        className="py-5 pl-16 mr-8 border-b flex flex-col"
+                        className="py-5 pl-16 pr-8 flex flex-col bg-white"
+                        style={{
+                            borderBottom: "1px solid #bfbfbf",
+                        }}
                         onClick={() => {
-                            const cp = [...checkBoxList];
-                            cp[i] = !cp[i];
-                            setCheckBoxList(cp);
+                            if (mailUid === v.mailUid) {
+                                return
+                            } else {
+                                const cp = [...checkBoxList];
+                                cp[i] = !cp[i];
+                                setCheckBoxList(cp);
+                            }
                         }}
                     >
                         <div className="flex items-center justify-between">
@@ -375,7 +386,7 @@ export default function Mail() {
                             </div>
                         </div>
                         {checkBoxList[i] ? (
-                            <div className="flex items-center">
+                            <div className="flex items-center -mt-2">
                                 {v.receiver.map((x, indx) => {
                                     return (
                                         <span className="text-xs text-gray-500" key={indx}>
@@ -404,6 +415,9 @@ export default function Mail() {
                                     <div
                                         className="relative"
                                         style={{ minWidth: 500 }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
                                     >
                                         <div className="border border-gray-400 py-4 pl-5 pr-7 bg-white shadow-xl absolute top-2 -left-6">
                                             <div className="flex items-center">
@@ -472,7 +486,7 @@ export default function Mail() {
                                 ) : null}
                             </div>
                         ) : null}
-                        <div className="mt-2">{v.content}</div>
+                        <div className={`${checkBoxList[i] ? "mt-0" : "-mt-1"}`}>{v.content}</div>
                     </div>
                 </div>
             );

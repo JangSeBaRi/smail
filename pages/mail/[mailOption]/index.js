@@ -143,7 +143,10 @@ export default function Mail() {
             return x;
         }).length;
         return (
-            <div className="flex py-2 px-3 items-center justify-start border-b space-x-2 relative">
+            <div className="flex py-2 px-3 items-center justify-start space-x-2 relative"
+            style={{
+                borderBottom: "1px solid #bfbfbf",
+            }}>
                 {trueArrayLength === 0 ? (
                     <Tooltip
                         title="선택"

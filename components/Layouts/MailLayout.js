@@ -124,8 +124,11 @@ const MailLayout = ({ children, onClick, mailOption }) => {
     const header = () => {
         return (
             <div
-                className="flex items-center border-b px-2 w-full"
+                className="flex items-center border-b px-2 py-2 w-full"
                 style={{ height: 65 }}
+                style={{
+                    borderBottom: "1px solid #bfbfbf",
+                }}
             >
                 <div className="flex items-center" style={{ minWidth: 250 }}>
                     <Tooltip
@@ -375,7 +378,10 @@ const MailLayout = ({ children, onClick, mailOption }) => {
         return (
             <div
                 className="flex flex-col items-center py-2 space-y-2 border-l"
-                style={{ minWidth: 55 }}
+                style={{
+                    borderLeft: "1px solid #bfbfbf",
+                    minWidth: 55,
+                }}
             >
                 {rightPanelOption.map(({ label, src }, i) => {
                     return (
@@ -566,7 +572,7 @@ const MailLayout = ({ children, onClick, mailOption }) => {
                                 }
                                 if (!mailcontent) {
                                     alert("메세지를 입력해주세요.");
-                                    return
+                                    return;
                                 }
                                 dispatch(
                                     createNewThread({
