@@ -378,7 +378,7 @@ export default function Mail() {
                             <div className="flex items-center">
                                 {v.receiver.map((x, indx) => {
                                     return (
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-gray-500" key={indx}>
                                             {indx !== v.receiver.length - 1
                                                 ? `${x.displayName}, `
                                                 : `${x.displayName}에게`}
@@ -430,7 +430,7 @@ export default function Mail() {
                                             </div>
                                             {v.receiver.map((x, indx) => {
                                                 return (
-                                                    <div className="flex items-center">
+                                                    <div className="flex items-center" key={indx}>
                                                         <div
                                                             style={{
                                                                 width: 70,
