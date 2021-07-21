@@ -36,9 +36,9 @@ const Home = () => {
     const userList = useSelector(({ user }) => user.userList);
     const threadList = useSelector(({ mailThread }) => mailThread.threadList);
 
-    useEffect(() => {
-        dispatch(setThreadList({ ...initialThreadList() }));
-    }, [dispatch, userList, threadList]);
+    // useEffect(() => {
+    //     dispatch(setThreadList({ ...initialThreadList() }));
+    // }, [dispatch, userList, threadList]);
 
     // useEffect(() => {
     //     console.log('userList')
