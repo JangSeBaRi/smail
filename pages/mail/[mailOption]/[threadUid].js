@@ -1,15 +1,15 @@
 import Head from "next/head";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import MailLayout from "../../../components/Layouts/MailLayout";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
 import {
     modifyMail,
     modifyThread,
-    deleteThread,
+    sendMail,
 } from "../../../reducers/store/mailThread";
-import { Tooltip, IconButton } from "@material-ui/core";
+import { Tooltip, IconButton, Button } from "@material-ui/core";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import UnfoldMoreIcon from "@material-ui/icons/UnfoldMore";
 import PrintIcon from "@material-ui/icons/Print";
@@ -26,10 +26,13 @@ import WatchLaterIcon from "@material-ui/icons/WatchLater";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ErrorIcon from "@material-ui/icons/Error";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ForwardIcon from "@material-ui/icons/Forward";
+import ClearIcon from "@material-ui/icons/Clear";
 
 export default function Mail() {
     const router = useRouter();
     const dispatch = useDispatch();
+    const mailcontentRef = useRef();
     const [mailOption, setMailOption] = useState("");
     const [headTitle, setHeadTitle] = useState("Smail");
     const [showSortList, setShowSortList] = useState(false);
@@ -37,9 +40,41 @@ export default function Mail() {
     const [mailList, setMailList] = useState([]);
     const [mailUid, setMailUid] = useState("");
     const [checkBoxList, setCheckBoxList] = useState([]);
+    const [receiver, setReceiver] = useState([]);
+    const [mailReceiver, setMailReceiver] = useState("");
+    const [mailcontent, setMailcontent] = useState("");
+    const [isVisibleSendMail, setIsVisibleSendMail] = useState(false);
 
     const loginUser = useSelector(({ user }) => user.loginUser);
+    const userList = useSelector(({ user }) => user.userList);
     const threadList = useSelector(({ mailThread }) => mailThread.threadList);
+
+    const resizeHeight = () => {
+        if (isVisibleSendMail) {
+            mailcontentRef.current.style.height = 70 + "px";
+            mailcontentRef.current.style.height =
+                mailcontentRef.current.scrollHeight + "px";
+        }
+    };
+
+    const handleReceiver = () => {
+        const email = mailReceiver.trim();
+        const index = receiver.findIndex((v) => {
+            return v === email;
+        });
+
+        if (index === -1 && email !== "") {
+            const cp = [...receiver];
+            cp.push(email);
+            setReceiver(cp);
+        }
+
+        setMailReceiver("");
+    };
+
+    useEffect(() => {
+        resizeHeight();
+    }, [mailcontent, isVisibleSendMail]);
 
     useEffect(() => {
         setCheckBoxList(
@@ -83,10 +118,11 @@ export default function Mail() {
 
     const headerTool = () => {
         return (
-            <div className="flex py-2 px-3 items-center justify-start space-x-4"
-            style={{
-                borderBottom: "1px solid #bfbfbf",
-            }}
+            <div
+                className="flex py-2 px-3 items-center justify-start space-x-4"
+                style={{
+                    borderBottom: "1px solid #bfbfbf",
+                }}
             >
                 <span
                     className="mr-3"
@@ -177,6 +213,80 @@ export default function Mail() {
         );
     };
 
+    const threadTitle = () => {
+        return (
+            <div className="flex items-center justify-between pt-2 pl-16 pr-8">
+                <div className="flex items-center">
+                    <span className="text-2xl w-max">
+                        {mailList.length > 0 &&
+                            mailList[mailList.length - 1].subject}
+                    </span>
+                    {!myThread.isImportant ? (
+                        <Tooltip
+                            title="Smail에 이 대화가 중요하다고 알려주려면 클릭하세요"
+                            placement="bottom-start"
+                            onClick={() => {
+                                dispatch(
+                                    modifyThread({
+                                        email: loginUser.email,
+                                        threadUid: myThread.threadUid,
+                                        modifyProps: {
+                                            isImportant: true,
+                                        },
+                                    })
+                                );
+                            }}
+                        >
+                            <IconButton size="medium">
+                                <LabelImportantIcon className="text-gray-500 hover:text-black" />
+                            </IconButton>
+                        </Tooltip>
+                    ) : (
+                        <Tooltip
+                            title="Smail에 이 대화가 중요하지 않다고 알려주려면 클릭하세요"
+                            placement="bottom-start"
+                            onClick={() => {
+                                dispatch(
+                                    modifyThread({
+                                        email: loginUser.email,
+                                        threadUid: myThread.threadUid,
+                                        modifyProps: {
+                                            isImportant: false,
+                                        },
+                                    })
+                                );
+                            }}
+                        >
+                            <IconButton size="medium">
+                                <LabelImportantIcon
+                                    style={{
+                                        color: "#F7CB4D",
+                                    }}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                </div>
+                <div className="flex items-center space-x-3">
+                    <Tooltip title="모두 펼치기">
+                        <IconButton size="small">
+                            <UnfoldMoreIcon className="text-gray-500 hover:text-black" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="모두 인쇄">
+                        <IconButton size="small">
+                            <PrintIcon className="text-gray-500 hover:text-black" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="새 창">
+                        <IconButton size="small">
+                            <LaunchIcon className="text-gray-500 hover:text-black" />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+            </div>
+        );
+    };
     const main = () => {
         return mailList.map((v, i) => {
             const now = new Date().getTime();
@@ -204,81 +314,17 @@ export default function Mail() {
             };
             return (
                 <div key={i}>
-                    <div className="flex items-center justify-between pt-2 pl-16 pr-8 bg-white">
-                        <div className="flex items-center">
-                            <span className="text-2xl">{v.subject}</span>
-                            {!myThread.isImportant ? (
-                                <Tooltip
-                                    title="Smail에 이 대화가 중요하다고 알려주려면 클릭하세요"
-                                    placement="bottom-start"
-                                    onClick={() => {
-                                        dispatch(
-                                            modifyThread({
-                                                email: loginUser.email,
-                                                threadUid: myThread.threadUid,
-                                                modifyProps: {
-                                                    isImportant: true,
-                                                },
-                                            })
-                                        );
-                                    }}
-                                >
-                                    <IconButton size="medium">
-                                        <LabelImportantIcon className="text-gray-500 hover:text-black" />
-                                    </IconButton>
-                                </Tooltip>
-                            ) : (
-                                <Tooltip
-                                    title="Smail에 이 대화가 중요하지 않다고 알려주려면 클릭하세요"
-                                    placement="bottom-start"
-                                    onClick={() => {
-                                        dispatch(
-                                            modifyThread({
-                                                email: loginUser.email,
-                                                threadUid: myThread.threadUid,
-                                                modifyProps: {
-                                                    isImportant: false,
-                                                },
-                                            })
-                                        );
-                                    }}
-                                >
-                                    <IconButton size="medium">
-                                        <LabelImportantIcon
-                                            style={{
-                                                color: "#F7CB4D",
-                                            }}
-                                        />
-                                    </IconButton>
-                                </Tooltip>
-                            )}
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <Tooltip title="모두 펼치기">
-                                <IconButton size="small">
-                                    <UnfoldMoreIcon className="text-gray-500 hover:text-black" />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="모두 인쇄">
-                                <IconButton size="small">
-                                    <PrintIcon className="text-gray-500 hover:text-black" />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="새 창">
-                                <IconButton size="small">
-                                    <LaunchIcon className="text-gray-500 hover:text-black" />
-                                </IconButton>
-                            </Tooltip>
-                        </div>
-                    </div>
                     <div
-                        className="py-5 pl-16 pr-8 flex flex-col bg-white"
+                        className="py-5 pl-16 pr-8 flex flex-col"
                         style={{
-                            borderBottom: "1px solid #bfbfbf",
+                            borderBottom:
+                                i === mailList.length - 1
+                                    ? undefined
+                                    : "1px solid #bfbfbf",
                         }}
                         onClick={() => {
                             if (mailUid === v.mailUid) {
-                                return
+                                return;
                             } else {
                                 const cp = [...checkBoxList];
                                 cp[i] = !cp[i];
@@ -288,7 +334,10 @@ export default function Mail() {
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-1 relative">
-                                <span className="absolute top-0" style={{left: -52}}>
+                                <span
+                                    className="absolute top-0"
+                                    style={{ left: -52 }}
+                                >
                                     <Image
                                         src={v.sender.profile}
                                         width="42px"
@@ -300,7 +349,8 @@ export default function Mail() {
                                 <span className="font-semibold relative -left-1 w-max">
                                     {v.sender.displayName}
                                 </span>
-                                {checkBoxList[i] ? (
+                                {checkBoxList[i] ||
+                                mailList.length - 1 === i ? (
                                     <span className="text-xs text-gray-600">
                                         {`<${v.sender.email}>`}
                                     </span>
@@ -359,10 +409,12 @@ export default function Mail() {
                                         </IconButton>
                                     </Tooltip>
                                 )}
-                                {checkBoxList[i] ? (
+                                {checkBoxList[i] ||
+                                mailList.length - 1 === i ? (
                                     <Tooltip
                                         title="답장"
                                         onClick={(e) => {
+                                            setIsVisibleSendMail(true);
                                             e.stopPropagation();
                                         }}
                                     >
@@ -371,7 +423,8 @@ export default function Mail() {
                                         </IconButton>
                                     </Tooltip>
                                 ) : null}
-                                {checkBoxList[i] ? (
+                                {checkBoxList[i] ||
+                                mailList.length - 1 === i ? (
                                     <Tooltip
                                         title="더보기"
                                         onClick={(e) => {
@@ -385,11 +438,14 @@ export default function Mail() {
                                 ) : null}
                             </div>
                         </div>
-                        {checkBoxList[i] ? (
-                            <div className="flex items-center -mt-2">
+                        {checkBoxList[i] || mailList.length - 1 === i ? (
+                            <div className="flex items-center -mt-2 w-max">
                                 {v.receiver.map((x, indx) => {
                                     return (
-                                        <span className="text-xs text-gray-500" key={indx}>
+                                        <span
+                                            className="text-xs text-gray-500"
+                                            key={indx}
+                                        >
                                             {indx !== v.receiver.length - 1
                                                 ? `${x.displayName}, `
                                                 : `${x.displayName}에게`}
@@ -419,7 +475,7 @@ export default function Mail() {
                                             e.stopPropagation();
                                         }}
                                     >
-                                        <div className="border border-gray-400 py-4 pl-5 pr-7 bg-white shadow-xl absolute top-2 -left-6">
+                                        <div className="border border-gray-400 py-4 pl-5 pr-7 bg-white shadow-xl absolute top-2 -left-6 z-40">
                                             <div className="flex items-center">
                                                 <div
                                                     style={{
@@ -444,7 +500,10 @@ export default function Mail() {
                                             </div>
                                             {v.receiver.map((x, indx) => {
                                                 return (
-                                                    <div className="flex items-center" key={indx}>
+                                                    <div
+                                                        className="flex items-center"
+                                                        key={indx}
+                                                    >
                                                         <div
                                                             style={{
                                                                 width: 70,
@@ -486,8 +545,212 @@ export default function Mail() {
                                 ) : null}
                             </div>
                         ) : null}
-                        <div className={`${checkBoxList[i] ? "mt-0" : "-mt-1"}`}>{v.content}</div>
+                        <div
+                            className={`${
+                                checkBoxList[i] || mailList.length - 1 === i
+                                    ? "mt-0"
+                                    : "-mt-1"
+                            } w-max`}
+                        >
+                            {v.content}
+                        </div>
                     </div>
+                    {!isVisibleSendMail && i === mailList.length - 1 ? (
+                        <div className="flex items-center space-x-4 mt-8 pl-16 pr-8 w-max">
+                            <div
+                                className="px-6 py-2 flex items-center space-x-2 border rounded text-gray-500 hover:bg-gray-100"
+                                onClick={() => {
+                                    if (v.sender.email === loginUser.email) {
+                                        setReceiver(
+                                            v.receiver.map((x) => {
+                                                return x.email;
+                                            })
+                                        );
+                                    } else {
+                                        setReceiver([v.sender.email])
+                                    }
+                                    
+                                    setIsVisibleSendMail(true);
+                                }}
+                            >
+                                <ReplyIcon />
+                                <span>답장</span>
+                            </div>
+                            <div
+                                className="px-6 py-2 flex items-center space-x-2 border rounded text-gray-500 hover:bg-gray-100"
+                                onClick={() => {
+                                    setIsVisibleSendMail(true);
+                                }}
+                            >
+                                <ForwardIcon />
+                                <span>전달</span>
+                            </div>
+                        </div>
+                    ) : isVisibleSendMail && i === mailList.length - 1 ? (
+                        <div className="pl-16 pr-8 relative mt-8 ">
+                            <span
+                                className="absolute top-2"
+                                style={{ left: 12 }}
+                            >
+                                <Image
+                                    src={v.sender.profile}
+                                    width="42px"
+                                    height="42px"
+                                    alt="profileImage"
+                                    className="rounded-full"
+                                />
+                            </span>
+                            <div
+                                className="border rounded-lg p-4"
+                                style={{ boxShadow: "0px 1px 1px #c1c1c1" }}
+                            >
+                                <div className="flex items-center">
+                                    <div className="flex items-center text-gray-500">
+                                        <ReplyIcon />
+                                        <ArrowDropDownIcon />
+                                        <div className="flex flex-auto flex-wrap items-center">
+                                            {receiver.map((re) => {
+                                                return (
+                                                    <div
+                                                        key={re}
+                                                        className="flex h-5 items-center justify-center px-2 mr-1.5 text-sm text-gray-500 border rounded-full hover:bg-gray-100"
+                                                    >
+                                                        <span className="mr-1">
+                                                            {re}
+                                                        </span>
+                                                        <ClearIcon
+                                                            size="15px"
+                                                            color="rgb(107, 114, 128)"
+                                                            className="cursor-pointer"
+                                                            onClick={() => {
+                                                                setReceiver(
+                                                                    [
+                                                                        ...receiver,
+                                                                    ].filter(
+                                                                        (v) => {
+                                                                            return (
+                                                                                v !==
+                                                                                re
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                );
+                                                            }}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                            <div className="flex-auto">
+                                                <input
+                                                    value={mailReceiver}
+                                                    onChange={(e) =>
+                                                        setMailReceiver(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    onKeyPress={(e) => {
+                                                        if (
+                                                            e.code === "Space"
+                                                        ) {
+                                                            handleReceiver();
+                                                        }
+                                                    }}
+                                                    onBlur={() =>
+                                                        handleReceiver()
+                                                    }
+                                                    className="w-full h-full text-sm outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    className="py-2 flex text-sm"
+                                    onClick={() => {
+                                        mailcontentRef.current.focus();
+                                    }}
+                                    style={{ cursor: "text" }}
+                                >
+                                    <textarea
+                                        ref={mailcontentRef}
+                                        className="outline-none flex-auto resize-none"
+                                        value={mailcontent}
+                                        onChange={(e) => {
+                                            setMailcontent(e.target.value);
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="py-3 flex absolute bottom-0 right-10 justify-end items-center">
+                                <Button
+                                    variant="contained"
+                                    style={{
+                                        backgroundColor: "#1A73E8",
+                                        borderRadius: "5px",
+                                        height: "36px",
+                                        color: "white",
+                                    }}
+                                    onClick={() => {
+                                        let num = 0;
+                                        if (receiver.length === 0) {
+                                            alert("받는사람을 입력해 주세요.");
+                                            return;
+                                        } else {
+                                            for (
+                                                var i = 0;
+                                                i < receiver.length;
+                                                i++
+                                            ) {
+                                                num = Object.keys(
+                                                    userList
+                                                ).indexOf(receiver[i]);
+                                                if (num === -1) {
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (num === -1) {
+                                            alert(
+                                                "이메일이 존재하지 않습니다. 가입한 사용자의 메일을 입력해주세요."
+                                            );
+                                            return;
+                                        }
+                                        if (!mailcontent) {
+                                            alert("메세지를 입력해주세요.");
+                                            return;
+                                        }
+                                        dispatch(
+                                            sendMail({
+                                                mailSender: loginUser.email,
+                                                mailReceiver: receiver,
+                                                mailTitle: v.subject,
+                                                mailcontent: mailcontent,
+                                                userList: userList,
+                                                senderThreadUid: myThread.threadUid,
+                                                receiverThreadUid: myThread.receiverList[0].threadUid,
+                                            })
+                                        );
+                                        setIsVisibleSendMail(false);
+                                        setMailcontent("");
+                                        alert("메일을 성공적으로 보냈습니다.");
+                                    }}
+                                >
+                                    보내기
+                                </Button>
+                                <div
+                                    className="w-7 h-7 flex justify-center items-center rounded text-gray-500 hover:text-black hover:bg-gray-100 ml-2 cursor-pointer"
+                                    onClick={() => {
+                                        setIsVisibleSendMail(false);
+                                        setMailcontent("");
+                                    }}
+                                >
+                                    <Tooltip title="임시보관 메일 삭제">
+                                        <DeleteIcon style={{ fontSize: 24 }} />
+                                    </Tooltip>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
                 </div>
             );
         });
@@ -506,7 +769,12 @@ export default function Mail() {
                 }}
             >
                 {headerTool()}
-                {main()}
+                <div className="bg-white pb-8">
+                    {threadTitle()}
+                    <div className="overflow-y-auto max-h-mail-list">
+                        {main()}
+                    </div>
+                </div>
             </MailLayout>
         </div>
     );

@@ -25,3 +25,7 @@ a {
   border-right: 1px solid #bfbfbf; */
   /* border-top: 1px solid #bfbfbf; */
 }
+
+*::-webkit-scrollbar {
+  display: none;
+}

@@ -21,6 +21,7 @@ import { logout } from "../../reducers/store/user";
 import MinimizeIcon from "@material-ui/icons/Minimize";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { createNewThread } from "../../reducers/store/mailThread";
+import { CallReceived } from "@material-ui/icons";
 
 const MailLayout = ({ children, onClick, mailOption }) => {
     const router = useRouter();
@@ -616,16 +617,18 @@ const MailLayout = ({ children, onClick, mailOption }) => {
     return (
         //bg-background
         <div
-            className="w-screen h-screen overflow-y-hidden bg-cover bg-background"
+            className="flex flex-col w-screen max-h-screen min-h-screen bg-cover bg-background"
             onClick={() => {
                 setShowUserInf(false);
                 onClick();
             }}
         >
             {header()}
-            <div className="flex flex-1 min-h-screen">
+            <div className="flex flex-1">
                 {leftPanel()}
-                <div className="flex-auto">{children}</div>
+                <div className="flex flex-col flex-auto overflow-y-auto min-h-list">
+                    {children}
+                </div>
                 {rightPanel()}
             </div>
             {showNewMail && newMail()}
